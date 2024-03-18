@@ -25,15 +25,24 @@
 <img id="scroll-animation" src="image/Hazen_Intro V4_00000.jpg" alt="Scroll animation frame">
 
 <script>
-  const frameCount = 139; // Adjust if you add/remove images, since it goes from 00000 to 00138, that's 139 images
+  const frameCount = 139; // Total number of images
   const baseImagePath = "image/Hazen_Intro V4_"; // Base path to the images
   const frameUrls = Array.from({ length: frameCount }, (_, index) => {
-    // This will pad the index with leading zeros to match your file names
     const paddedIndex = String(index).padStart(5, '0');
     return `${baseImagePath}${paddedIndex}.jpg`;
   });
-  const imgElement = document.getElementById('scroll-animation');
 
+  // Preload images
+  function preloadImages(urls) {
+    urls.forEach(url => {
+      const img = new Image();
+      img.src = url;
+    });
+  }
+
+  preloadImages(frameUrls); // Call this to preload all images
+
+  const imgElement = document.getElementById('scroll-animation');
   window.addEventListener('scroll', () => {
     const scrollFraction = window.scrollY / (document.body.scrollHeight - window.innerHeight);
     const frameIndex = Math.min(frameCount - 1, Math.floor(scrollFraction * frameCount));
