@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Scroll Animation Test</title>
+<title>Smooth Scroll Animation</title>
 <style>
   body, html {
     margin: 0;
@@ -43,12 +43,43 @@
   preloadImages(frameUrls); // Call this to preload all images
 
   const imgElement = document.getElementById('scroll-animation');
-  window.addEventListener('scroll', () => {
-    const scrollFraction = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+  let currentScrollPosition = window.scrollY;
+  let targetScrollPosition = window.scrollY;
+  let animationFrameId;
+
+  function animateScroll() {
+    // Calculate the difference between the current and target positions
+    const difference = targetScrollPosition - currentScrollPosition;
+    // Apply easing (Here, 0.1 is the easing factor, adjust as necessary for smoother or quicker transition)
+    const delta = difference * 0.09;
+
+    currentScrollPosition += delta;
+
+    // Update the frame based on the currentScrollPosition
+    const scrollFraction = currentScrollPosition / (document.body.scrollHeight - window.innerHeight);
     const frameIndex = Math.min(frameCount - 1, Math.floor(scrollFraction * frameCount));
     imgElement.src = frameUrls[frameIndex];
+
+    // Continue the animation if there's a significant difference between current and target
+    if (Math.abs(delta) > 0.5) {
+      animationFrameId = requestAnimationFrame(animateScroll);
+    } else {
+      // Stop the animation frame if the difference is minimal
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = null; // Reset the animation frame ID
+    }
+  }
+
+  window.addEventListener('scroll', () => {
+    targetScrollPosition = window.scrollY;
+    if (!animationFrameId) {
+      animateScroll();
+    }
   });
 </script>
 
 </body>
 </html>
+
+
+
