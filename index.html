@@ -3,87 +3,70 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Smooth Scroll Animation</title>
+<title>Document-Adaptive Smooth Scroll Animation</title>
 <style>
-  body, html {
-    margin: 0;
-    padding: 0;
-    height: 300%; /* Adjust this for longer or shorter scroll lengths */
-  }
-  img {
+  /* Minimal styling to ensure the image stays centered */
+  .scroll-animation {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     max-width: 100%;
     height: auto;
+    z-index: 1000; /* Ensure it's above other content */
+  }
+  /* Ensure there's enough content to scroll */
+  body {
+    height: 300vh; /* Adjust this value based on your content */
   }
 </style>
 </head>
 <body>
 
-<!-- Updated src attribute to load the first frame initially -->
-<img id="scroll-animation" src="https://res.cloudinary.com/dn9pwzu2b/image/upload/v1711072707/image/Hazen_Intro_V4_00000.webp" alt="Scroll animation frame">  
+<img id="scroll-animation" class="scroll-animation" src="https://res.cloudinary.com/dn9pwzu2b/image/upload/v1711072707/image/Hazen_Intro_V4_00000.webp" alt="Scroll animation frame">
+
 <script>
-  const frameCount = 139; // Total number of images
-  // Updated base path to use the Cloudinary URL
-  const baseImagePath = "https://res.cloudinary.com/dn9pwzu2b/image/upload/v1711072707/image/Hazen_Intro_V4_"; // Base path to the images on Cloudinary
-  const frameUrls = Array.from({ length: frameCount }, (_, index) => {
-    const paddedIndex = String(index).padStart(5, '0');
-    // Note the ".webp" extension is already included in the baseImagePath
-    return `${baseImagePath}${paddedIndex}.webp`;
-  });
+  const frameCount = 139;
+  const baseImagePath = "https://res.cloudinary.com/dn9pwzu2b/image/upload/v1711072707/image/Hazen_Intro_V4_";
+  const frameUrls = Array.from({ length: frameCount }, (_, index) => `${baseImagePath}${String(index).padStart(5, '0')}.webp`);
 
   const imgElement = document.getElementById('scroll-animation');
-  let currentScrollPosition = window.scrollY;
-  let targetScrollPosition = window.scrollY;
+  let lastScrollPosition = 0;
   let animationFrameId;
 
-  // Preload all images
-  function preloadAllImages() {
-    const imagesPreloaded = frameUrls.map(url => {
-      return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.onload = resolve;
-        img.onerror = reject;
-        img.src = url;
-      });
-    });
-
-    Promise.all(imagesPreloaded).then(() => {
-      console.log("All images preloaded");
-      animateScroll(); // Set the initial frame based on current scroll position after images are preloaded
-    }).catch(error => {
-      console.error("An error occurred while preloading images:", error);
-    });
-  }
-
   function animateScroll() {
-    const difference = targetScrollPosition - currentScrollPosition;
-    const delta = difference * 0.09;
-
-    currentScrollPosition += delta;
-
-    const scrollFraction = currentScrollPosition / (document.body.scrollHeight - window.innerHeight);
-    const frameIndex = Math.min(frameCount - 1, Math.floor(scrollFraction * frameCount));
-    imgElement.src = frameUrls[frameIndex]; // Display the current frame
-
-    if (Math.abs(delta) > 0.5) {
-      animationFrameId = requestAnimationFrame(animateScroll);
-    } else {
+    const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+    const scrollDifference = scrollPosition - lastScrollPosition;
+    if (Math.abs(scrollDifference) < 1) {
       cancelAnimationFrame(animationFrameId);
       animationFrameId = null;
+      return;
     }
+
+    const scrollFraction = scrollPosition / (document.documentElement.scrollHeight - window.innerHeight);
+    const frameIndex = Math.min(frameCount - 1, Math.floor(scrollFraction * frameCount));
+    imgElement.src = frameUrls[frameIndex];
+    lastScrollPosition = scrollPosition;
+
+    animationFrameId = requestAnimationFrame(animateScroll);
   }
 
-  preloadAllImages(); // Preload all images at once
-
+  // Listen for scroll events to start the animation
   window.addEventListener('scroll', () => {
-    targetScrollPosition = window.scrollY;
     if (!animationFrameId) {
-      animateScroll();
+      animationFrameId = requestAnimationFrame(animateScroll);
     }
   });
+
+  // Optionally preload images to reduce flicker
+  function preloadImages() {
+    frameUrls.forEach(url => {
+      const img = new Image();
+      img.src = url;
+    });
+  }
+
+  preloadImages(); // Call this function if you want to preload images
 </script>
 </body>
 </html>
