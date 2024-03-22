@@ -22,12 +22,14 @@
 </head>
 <body>
 
-<img id="scroll-animation" src="image/Hazen_Intro V4_00000.webp" alt="Scroll animation frame">  
+<img id="scroll-animation" src="" alt="Scroll animation frame">  
 <script>
-  const frameCount = 139; // Total number of images this is test bbyyyy
-  const baseImagePath = "image/Hazen_Intro V4_"; // Base path to the images
+  const frameCount = 139; // Total number of images
+  // Updated base path to use the Cloudinary URL
+  const baseImagePath = "https://res.cloudinary.com/dn9pwzu2b/image/upload/v1711072707/image/Hazen_Intro_V4_"; // Base path to the images on Cloudinary
   const frameUrls = Array.from({ length: frameCount }, (_, index) => {
     const paddedIndex = String(index).padStart(5, '0');
+    // Note the ".webp" extension is already included in the baseImagePath
     return `${baseImagePath}${paddedIndex}.webp`;
   });
 
@@ -84,5 +86,3 @@
 </script>
 </body>
 </html>
-
-
