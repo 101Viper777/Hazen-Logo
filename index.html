@@ -32,41 +32,40 @@
     return `${baseImagePath}${paddedIndex}.jpg`;
   });
 
-  // Preload images
-  function preloadImages(urls) {
-    urls.forEach(url => {
-      const img = new Image();
-      img.src = url;
-    });
-  }
-
-  preloadImages(frameUrls); // Call this to preload all images
-
   const imgElement = document.getElementById('scroll-animation');
   let currentScrollPosition = window.scrollY;
   let targetScrollPosition = window.scrollY;
   let animationFrameId;
+  let loadedImages = {}; // Object to keep track of loaded images
+
+  function loadImageIfNeeded(frameIndex) {
+    const frameUrl = frameUrls[frameIndex];
+    if (!loadedImages[frameUrl]) {
+      const img = new Image();
+      img.onload = () => {
+        loadedImages[frameUrl] = true; // Mark as loaded
+      };
+      img.src = frameUrl;
+    }
+  }
 
   function animateScroll() {
-    // Calculate the difference between the current and target positions
     const difference = targetScrollPosition - currentScrollPosition;
-    // Apply easing (Here, 0.1 is the easing factor, adjust as necessary for smoother or quicker transition)
     const delta = difference * 0.09;
 
     currentScrollPosition += delta;
 
-    // Update the frame based on the currentScrollPosition
     const scrollFraction = currentScrollPosition / (document.body.scrollHeight - window.innerHeight);
     const frameIndex = Math.min(frameCount - 1, Math.floor(scrollFraction * frameCount));
-    imgElement.src = frameUrls[frameIndex];
 
-    // Continue the animation if there's a significant difference between current and target
+    loadImageIfNeeded(frameIndex); // Load the current frame if needed
+    imgElement.src = frameUrls[frameIndex]; // Display the current frame
+
     if (Math.abs(delta) > 0.5) {
       animationFrameId = requestAnimationFrame(animateScroll);
     } else {
-      // Stop the animation frame if the difference is minimal
       cancelAnimationFrame(animationFrameId);
-      animationFrameId = null; // Reset the animation frame ID
+      animationFrameId = null;
     }
   }
 
@@ -77,6 +76,7 @@
     }
   });
 </script>
+
 
 </body>
 </html>
