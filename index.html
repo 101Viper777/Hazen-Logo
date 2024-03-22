@@ -22,48 +22,22 @@
 <body>
 
 <img id="scroll-animation" class="scroll-animation" src="https://res.cloudinary.com/dn9pwzu2b/image/upload/v1711072707/image/Hazen_Intro_V4_00000.webp" alt="Scroll animation frame">
-
 <script>
   const frameCount = 139;
   const baseImagePath = "https://res.cloudinary.com/dn9pwzu2b/image/upload/v1711072707/image/Hazen_Intro_V4_";
   const frameUrls = Array.from({ length: frameCount }, (_, index) => `${baseImagePath}${String(index).padStart(5, '0')}.webp`);
 
   const imgElement = document.getElementById('scroll-animation');
-  let lastScrollPosition = 0;
 
+  function updateImageForScroll() {
+    const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+    const scrollFraction = scrollPosition / (document.documentElement.scrollHeight - window.innerHeight);
+    const frameIndex = Math.max(0, Math.ceil(scrollFraction * frameCount) - 1);
+    imgElement.src = frameUrls[frameIndex];
+  }
 
-// function updateImageForScroll() {
-//   const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
-//   // Calculate total scrollable length
-//   const totalScrollLength = document.documentElement.scrollHeight - window.innerHeight;
-//   // Adjust scrollFraction calculation to slow down the animation progression
-//   const scrollFraction = (scrollPosition / totalScrollLength) * 4; // Scale factor adjusted here
-//   // Ensure frameIndex is within bounds
-//   const frameIndex = Math.max(0, Math.min(frameCount - 1, Math.floor(scrollFraction * frameCount)));
-//   imgElement.src = frameUrls[frameIndex];
-// }
-function updateImageForScroll() {
-  const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
-  const totalScrollLength = document.documentElement.scrollHeight - window.innerHeight;
-  
-  // Adjusting the scrollFraction calculation
-  let scrollFraction = scrollPosition / totalScrollLength;
-  
-  // To make the animation finish later, you might want to scale the scrollFraction
-  // so that it reaches 1.0 closer to the bottom of the page.
-  // One way to do this is to subtract a small value from scrollFraction before it reaches the end.
-  // This example assumes the animation should extend by an additional 20% of the scrollable area.
-  scrollFraction = scrollFraction * (1.0 / (1.0 + 0.2)); // Scale down to finish later
-  
-  const frameIndex = Math.max(0, Math.min(frameCount - 1, Math.floor(scrollFraction * frameCount)));
-  imgElement.src = frameUrls[frameIndex];
-}
-
-
-  // Listen for scroll events to update the image
   window.addEventListener('scroll', updateImageForScroll);
 
-  // Optionally preload images to improve performance and reduce flickering
   function preloadImages() {
     frameUrls.forEach(url => {
       const img = new Image();
@@ -71,7 +45,8 @@ function updateImageForScroll() {
     });
   }
 
-  preloadImages(); // Call this function if you want to preload images
+  preloadImages();
 </script>
+
 </body>
 </html>
