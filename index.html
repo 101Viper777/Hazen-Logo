@@ -22,14 +22,14 @@
 </head>
 <body>
 
-<img id="scroll-animation" src="image/Hazen_Intro V4_00000.jpg" alt="Scroll animation frame">
+<img id="scroll-animation" src="image/Hazen_Intro V4_00000.webp" alt="Scroll animation frame">
 <script>
   const frameCount = 139; // Total number of images
   const baseImagePath = "image/Hazen_Intro V4_"; // Base path to the images
   const initialPreloadCount = 30; // Number of images to preload for smooth start
   const frameUrls = Array.from({ length: frameCount }, (_, index) => {
     const paddedIndex = String(index).padStart(5, '0');
-    return `${baseImagePath}${paddedIndex}.jpg`;
+    return `${baseImagePath}${paddedIndex}.webp`;
   });
 
   const imgElement = document.getElementById('scroll-animation');
