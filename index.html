@@ -23,7 +23,71 @@
 <body>
 
 <img id="scroll-animation" src="image/Hazen_Intro V4_00000.jpg" alt="Scroll animation frame">
+<script>
+  const frameCount = 139; // Total number of images
+  const baseImagePath = "image/Hazen_Intro V4_"; // Base path to the images
+  const initialPreloadCount = 30; // Number of images to preload for smooth start
+  const frameUrls = Array.from({ length: frameCount }, (_, index) => {
+    const paddedIndex = String(index).padStart(5, '0');
+    return `${baseImagePath}${paddedIndex}.jpg`;
+  });
 
+  const imgElement = document.getElementById('scroll-animation');
+  let currentScrollPosition = window.scrollY;
+  let targetScrollPosition = window.scrollY;
+  let animationFrameId;
+  let loadedImages = {}; // Object to keep track of loaded images
+
+  // Preload initial set of images
+  function preloadInitialImages() {
+    for (let i = 0; i < initialPreloadCount; i++) {
+      loadImageIfNeeded(i);
+    }
+  }
+
+  function loadImageIfNeeded(frameIndex) {
+    const frameUrl = frameUrls[frameIndex];
+    if (!loadedImages[frameUrl]) {
+      const img = new Image();
+      img.onload = () => {
+        loadedImages[frameUrl] = true; // Mark as loaded
+      };
+      img.src = frameUrl;
+    }
+  }
+
+  function animateScroll() {
+    const difference = targetScrollPosition - currentScrollPosition;
+    const delta = difference * 0.09;
+
+    currentScrollPosition += delta;
+
+    const scrollFraction = currentScrollPosition / (document.body.scrollHeight - window.innerHeight);
+    const frameIndex = Math.min(frameCount - 1, Math.floor(scrollFraction * frameCount));
+
+    loadImageIfNeeded(frameIndex); // Load the current frame if needed
+    imgElement.src = frameUrls[frameIndex]; // Display the current frame
+
+    if (Math.abs(delta) > 0.5) {
+      animationFrameId = requestAnimationFrame(animateScroll);
+    } else {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = null;
+    }
+  }
+
+  preloadInitialImages(); // Preload the initial set of images for a smooth start
+
+  window.addEventListener('scroll', () => {
+    targetScrollPosition = window.scrollY;
+    if (!animationFrameId) {
+      animateScroll();
+    }
+  });
+</script>
+
+
+<!-- 
 <script>
   const frameCount = 139; // Total number of images
   const baseImagePath = "image/Hazen_Intro V4_"; // Base path to the images
@@ -76,7 +140,7 @@
     }
   });
 </script>
-
+ -->
 
 </body>
 </html>
