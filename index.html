@@ -22,7 +22,8 @@
 </head>
 <body>
 
-<img id="scroll-animation" src="" alt="Scroll animation frame">  
+<!-- Updated src attribute to load the first frame initially -->
+<img id="scroll-animation" src="https://res.cloudinary.com/dn9pwzu2b/image/upload/v1711072707/image/Hazen_Intro_V4_00000.webp" alt="Scroll animation frame">  
 <script>
   const frameCount = 139; // Total number of images
   // Updated base path to use the Cloudinary URL
@@ -51,7 +52,7 @@
 
     Promise.all(imagesPreloaded).then(() => {
       console.log("All images preloaded");
-      // Optionally, perform any actions needed after all images have loaded
+      animateScroll(); // Set the initial frame based on current scroll position after images are preloaded
     }).catch(error => {
       console.error("An error occurred while preloading images:", error);
     });
