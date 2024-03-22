@@ -9,30 +9,48 @@
     position: sticky;
     top: 0;
     max-width: 100%;
-    height: auto;
-    z-index: 1000; /* Ensures it's above other content, adjust as needed */
+    height: 100vh; /* Fixed: Removed duplicate height property */
   }
-  /* Ensure there's enough content to scroll */
-  body {
-    min-height: 200vh; /* This ensures that there's a scrolling effect. Adjust based on actual content */
+  .holder {
+    min-height: 200vh; /* This ensures that there's a scrolling effect within the holder */
     margin: 0; /* Resets default margin */
   }
 </style>
 </head>
 <body>
+<div class="holder">
+  <img id="scroll-animation" class="scroll-animation" src="https://res.cloudinary.com/dn9pwzu2b/image/upload/v1711072707/image/Hazen_Intro_V4_00000.webp" alt="Scroll animation frame">
+</div>
+<!-- Adjusted extra div heights for demonstration purposes -->
+<div style="height: 100vh;"></div>
+<div style="height: 100vh;"></div>
+<div style="height: 100vh;"></div>
 
-<img id="scroll-animation" class="scroll-animation" src="https://res.cloudinary.com/dn9pwzu2b/image/upload/v1711072707/image/Hazen_Intro_V4_00000.webp" alt="Scroll animation frame">
 <script>
   const frameCount = 139;
   const baseImagePath = "https://res.cloudinary.com/dn9pwzu2b/image/upload/v1711072707/image/Hazen_Intro_V4_";
   const frameUrls = Array.from({ length: frameCount }, (_, index) => `${baseImagePath}${String(index).padStart(5, '0')}.webp`);
 
   const imgElement = document.getElementById('scroll-animation');
-
+  const holderElement = document.querySelector('.holder');
+  
   function updateImageForScroll() {
     const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
-    const scrollFraction = scrollPosition / (document.documentElement.scrollHeight - window.innerHeight);
-    const frameIndex = Math.max(0, Math.ceil(scrollFraction * frameCount) - 1);
+    // Calculate holder's top and bottom position relative to the viewport
+    const holderRect = holderElement.getBoundingClientRect();
+    const holderTop = holderRect.top + scrollPosition;
+    const holderBottom = holderRect.bottom + scrollPosition;
+
+    // Determine the scrollable height within the holder where the animation should be active
+    const holderScrollHeight = holderBottom - holderTop - window.innerHeight;
+    
+    // Calculate the current scroll within the holder
+    const scrollInsideHolder = Math.max(0, scrollPosition - holderTop);
+    
+    // Calculate the fraction of the scroll within the holder
+    const scrollFraction = Math.min(1, scrollInsideHolder / holderScrollHeight);
+    
+    const frameIndex = Math.max(0, Math.floor(scrollFraction * frameCount));
     imgElement.src = frameUrls[frameIndex];
   }
 
@@ -47,6 +65,5 @@
 
   preloadImages();
 </script>
-
 </body>
 </html>
