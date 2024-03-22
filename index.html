@@ -3,21 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Document-Adaptive Smooth Scroll Animation</title>
+<title>Sticky Smooth Scroll Animation</title>
 <style>
-  /* Minimal styling to ensure the image stays centered */
   .scroll-animation {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    position: sticky;
+    top: 0;
     max-width: 100%;
     height: auto;
-    z-index: 1000; /* Ensure it's above other content */
+    z-index: 1000; /* Ensures it's above other content, adjust as needed */
   }
   /* Ensure there's enough content to scroll */
   body {
-    height: 300vh; /* Adjust this value based on your content */
+    min-height: 200vh; /* This ensures that there's a scrolling effect. Adjust based on actual content */
+    margin: 0; /* Resets default margin */
   }
 </style>
 </head>
@@ -32,33 +30,20 @@
 
   const imgElement = document.getElementById('scroll-animation');
   let lastScrollPosition = 0;
-  let animationFrameId;
 
-  function animateScroll() {
-    const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
-    const scrollDifference = scrollPosition - lastScrollPosition;
-    if (Math.abs(scrollDifference) < 1) {
-      cancelAnimationFrame(animationFrameId);
-      animationFrameId = null;
-      return;
-    }
+  function updateImageForScroll() {
+  const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+  const scrollFraction = scrollPosition / (document.documentElement.scrollHeight - window.innerHeight);
+  // Ensure frameIndex never goes below 0
+  const frameIndex = Math.max(0, Math.ceil(scrollFraction * frameCount) - 1);
+  imgElement.src = frameUrls[frameIndex];
+}
 
-    const scrollFraction = scrollPosition / (document.documentElement.scrollHeight - window.innerHeight);
-    const frameIndex = Math.min(frameCount - 1, Math.floor(scrollFraction * frameCount));
-    imgElement.src = frameUrls[frameIndex];
-    lastScrollPosition = scrollPosition;
 
-    animationFrameId = requestAnimationFrame(animateScroll);
-  }
+  // Listen for scroll events to update the image
+  window.addEventListener('scroll', updateImageForScroll);
 
-  // Listen for scroll events to start the animation
-  window.addEventListener('scroll', () => {
-    if (!animationFrameId) {
-      animationFrameId = requestAnimationFrame(animateScroll);
-    }
-  });
-
-  // Optionally preload images to reduce flicker
+  // Optionally preload images to improve performance and reduce flickering
   function preloadImages() {
     frameUrls.forEach(url => {
       const img = new Image();
