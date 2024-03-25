@@ -33,26 +33,28 @@
 
   const imgElement = document.getElementById('scroll-animation');
   const holderElement = document.querySelector('.holder');
-  
   function updateImageForScroll() {
-    const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
-    // Calculate holder's top and bottom position relative to the viewport
-    const holderRect = holderElement.getBoundingClientRect();
-    const holderTop = holderRect.top + scrollPosition;
-    const holderBottom = holderRect.bottom + scrollPosition;
+  const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+  const holderRect = holderElement.getBoundingClientRect();
+  const holderTop = holderRect.top + scrollPosition;
+  const holderBottom = holderRect.bottom + scrollPosition;
 
-    // Determine the scrollable height within the holder where the animation should be active
-    const holderScrollHeight = holderBottom - holderTop - window.innerHeight;
-    
-    // Calculate the current scroll within the holder
-    const scrollInsideHolder = Math.max(0, scrollPosition - holderTop);
-    
-    // Calculate the fraction of the scroll within the holder
-    const scrollFraction = Math.min(1, scrollInsideHolder / holderScrollHeight);
-    
-    const frameIndex = Math.max(0, Math.floor(scrollFraction * frameCount));
-    imgElement.src = frameUrls[frameIndex];
-  }
+  // Calculate the scrollable height within the holder where the animation should be active
+  const holderScrollHeight = (holderBottom - holderTop - window.innerHeight);
+
+  // Calculate the current scroll within the holder
+  const scrollInsideHolder = Math.max(0, scrollPosition - holderTop);
+
+  // Calculate the fraction of the scroll within the holder
+  const scrollFraction = Math.min(1, scrollInsideHolder / holderScrollHeight);
+
+  // Adjust frameIndex calculation to ensure it doesn't exceed frameCount - 1
+  // Clamp the frameIndex between 0 and frameCount - 1 to prevent accessing undefined
+  const frameIndex = Math.min(frameCount - 1, Math.max(0, Math.floor(scrollFraction * frameCount)));
+
+  imgElement.src = frameUrls[frameIndex];
+}
+
 
   window.addEventListener('scroll', updateImageForScroll);
 
