@@ -1,71 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sticky Smooth Scroll Animation</title>
-<style>
-  .scroll-animation {
-    position: sticky;
-    top: 0;
-    max-width: 100%;
-    height: 100vh; /* Fixed: Removed duplicate height property */
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scrub Video</title>
+  <style>
+:root {
+  --side-margin: 5rem;
+}
+
+@media screen and (max-width: 600px) {
+  :root {
+    --side-margin: 2rem;
   }
-  .holder {
-    min-height: 200vh; /* This ensures that there's a scrolling effect within the holder */
-    margin: 0; /* Resets default margin */
-  }
-</style>
-</head>
-<body>
-<div class="holder">
-  <img id="scroll-animation" class="scroll-animation" src="https://res.cloudinary.com/dn9pwzu2b/image/upload/v1711072707/image/Hazen_Intro_V4_00000.webp" alt="Scroll animation frame">
-</div>
-<!-- Adjusted extra div heights for demonstration purposes -->
-<div style="height: 100vh;"></div>
-<div style="height: 100vh;"></div>
-<div style="height: 100vh;"></div>
-
-<script>
-  const frameCount = 139;
-  const baseImagePath = "https://res.cloudinary.com/dn9pwzu2b/image/upload/v1711072707/image/Hazen_Intro_V4_";
-  const frameUrls = Array.from({ length: frameCount }, (_, index) => `${baseImagePath}${String(index).padStart(5, '0')}.webp`);
-
-  const imgElement = document.getElementById('scroll-animation');
-  const holderElement = document.querySelector('.holder');
-  function updateImageForScroll() {
-  const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
-  const holderRect = holderElement.getBoundingClientRect();
-  const holderTop = holderRect.top + scrollPosition;
-  const holderBottom = holderRect.bottom + scrollPosition;
-
-  // Calculate the scrollable height within the holder where the animation should be active
-  const holderScrollHeight = (holderBottom - holderTop - window.innerHeight);
-
-  // Calculate the current scroll within the holder
-  const scrollInsideHolder = Math.max(0, scrollPosition - holderTop);
-
-  // Calculate the fraction of the scroll within the holder
-  const scrollFraction = Math.min(1, scrollInsideHolder / holderScrollHeight);
-
-  // Adjust frameIndex calculation to ensure it doesn't exceed frameCount - 1
-  // Clamp the frameIndex between 0 and frameCount - 1 to prevent accessing undefined
-  const frameIndex = Math.min(frameCount - 1, Math.max(0, Math.floor(scrollFraction * frameCount)));
-
-  imgElement.src = frameUrls[frameIndex];
 }
 
 
-  window.addEventListener('scroll', updateImageForScroll);
+body {
+  font-family: Inter, "system-ui", "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+}
 
-  function preloadImages() {
-    frameUrls.forEach(url => {
-      const img = new Image();
-      img.src = url;
-    });
-  }
+body {
+  margin: 0;
+}
 
-  preloadImages();
-</script>
+h2,
+p {
+  margin-left: var(--side-margin);
+  margin-right: var(--side-margin);
+}
+
+.scrub-video-container {
+  margin-left: 5rem;
+  margin-right: 5rem;
+  position: sticky;
+  top: 0px;
+  height: 100vh;
+  transition: all 0.2s;
+}
+
+.scrub-video-container.in-view {
+  margin: 0;
+}
+
+.scrub-video-container.in-view video {
+    top: 0;
+    height: 100%;
+}
+
+.scrub-video-wrapper {
+  height: 600vh;
+}
+
+video {
+    position: absolute;
+    top: 3em;
+    left: 0;
+    width: 100%;
+    height: calc(100% - 6em);
+    object-fit: cover;
+    transition: all 0.2s;
+}  </style>
+</head>
+<body>
+  <div class='scrub-video-wrapper'>
+    <div class='scrub-video-container'>
+      <video src='image/GOT.mp4' muted loop playsinline></video>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
